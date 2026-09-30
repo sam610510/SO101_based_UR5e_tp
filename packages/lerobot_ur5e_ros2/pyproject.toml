@@ -1,0 +1,15 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "lerobot_robot_ur5e_ros2"
+version = "0.1.0"
+description = "LeRobot Robot/Teleoperator wrapper around the existing SO101 -> UR5e ROS2 teleop node"
+requires-python = ">=3.10"
+dependencies = [
+    "numpy",
+]
+
+[tool.setuptools]
+packages = ["lerobot_robot_ur5e_ros2"]
