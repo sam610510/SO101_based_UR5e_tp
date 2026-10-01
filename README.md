@@ -30,8 +30,9 @@ packages/
     scripts/test_follower_mock.py                    Standalone smoke test for the follower wrapper (mock hardware)
 
   ur5e_description/       UR5e + Robotiq 2F-140 URDF/xacro and meshes, for RViz visualization
-  so101_description/      SO101 leader URDF/xacro (reference only -- the teleop node's kinematics are
-                           computed directly in Python, not loaded from this URDF)
+  so101_description/      SO-ARM101 description package, vendored unchanged (see "External dependency"
+                           below) -- reference only, the teleop node's kinematics are computed directly
+                           in Python, not loaded from this URDF
 ```
 
 ## Prerequisites
@@ -45,10 +46,14 @@ packages/
 
 ## Setup
 
-1. Copy `packages/so100_control`, `packages/ur5e_description`, and `packages/so101_description` into a colcon workspace `src/`, then:
+1. Symlink (do not copy) `packages/so100_control`, `packages/ur5e_description`, and `packages/so101_description` into a colcon workspace `src/`, then build:
    ```bash
-   colcon build --packages-select so100_control ur5e_description so101_description --symlink-install
+   ln -s "$(pwd)/packages/so100_control" <colcon-ws>/src/so100_control
+   ln -s "$(pwd)/packages/ur5e_description" <colcon-ws>/src/ur5e_description
+   ln -s "$(pwd)/packages/so101_description" <colcon-ws>/src/so101_description
+   cd <colcon-ws> && colcon build --packages-select so100_control ur5e_description so101_description --symlink-install
    ```
+   `lerobot_robot_ur5e_ros2/_bridge.py` imports `so101_ur5e_teleop_node.py` from `packages/so100_control` inside this repo directly (walking up from its own file location; override with the `SO100_CONTROL_SRC` env var to point it elsewhere). Symlinking rather than copying into the colcon workspace just means an edit to `so101_ur5e_teleop_node.py` (e.g. retuning a safety threshold for your own setup) only has to happen in one place instead of two.
 2. Install the LeRobot integration into your `lerobot` environment:
    ```bash
    source /opt/ros/humble/setup.bash
@@ -126,6 +131,8 @@ cd packages/lerobot_ur5e_ros2/scripts
 
 This invokes `lerobot-record` once per episode (rather than once for the whole session) so that every episode gets its own `connect()` -> smooth home -> wait for the SO101 leader to re-arm -> record -> disconnect cycle. `SO101UR5eLeader.connect()` blocks until the leader is armed before returning, so the recorded window always starts already in following mode -- no leading frames of the arm sitting still at home.
 
+Both scripts default to `$HOME/miniconda3/envs/lerobot/bin/{lerobot-record,python}`; if your `lerobot` environment lives elsewhere, either make sure `lerobot-record`/`python` resolve correctly on `PATH`, or set `LEROBOT_RECORD_BIN=/path/to/lerobot-record` and `LEROBOT_PYTHON_BIN=/path/to/python` before running either script.
+
 ## Training
 
 Standard `lerobot-train`, e.g.:
@@ -166,6 +173,7 @@ None of this checks for collisions with external objects (the table, a workpiece
 - The real-time IK solver has no automatic recovery if repeated warm-start attempts fail to converge under fast leader motion; it falls back to a slower multi-seed solve, which increases loop latency rather than failing outright.
 - `UR5E_HOME_Q`, `SO101_ARM_REF`, and the workspace bounding boxes are specific to one physical mounting arrangement (see "Setup" above).
 
-## External dependency
+## External dependencies vendored in this repo
 
-The Robotiq 2F-140 mesh/macro under `packages/ur5e_description/urdf/` originates from [ros2_robotiq_gripper](https://github.com/PickNikRobotics/ros2_robotiq_gripper); only the description assets are vendored here, not the ros2_control driver packages from that repo.
+- The Robotiq 2F-140 mesh/macro under `packages/ur5e_description/urdf/` originates from [ros2_robotiq_gripper](https://github.com/PickNikRobotics/ros2_robotiq_gripper); only the description assets are vendored here, not the ros2_control driver packages from that repo.
+- `packages/so101_description` is the SO-ARM101 description package (BSD license; see its `package.xml` for the original maintainer) vendored unchanged. It is a complete, independently-maintained ROS2 package (URDF, meshes, joint limits/initial-positions config) and is not modified here beyond being copied in as-is.

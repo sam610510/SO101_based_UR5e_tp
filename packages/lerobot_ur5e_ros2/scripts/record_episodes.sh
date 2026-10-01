@@ -14,8 +14,21 @@ MOCK_GRIPPER="${5:-true}"
 ROBOT_IP="${6:-}"
 RESET_TIME_S="${7:-6}"
 
-LEROBOT="$HOME/miniconda3/envs/lerobot/bin/lerobot-record"
-PY="$HOME/miniconda3/envs/lerobot/bin/python"
+DEFAULT_LEROBOT_ENV="$HOME/miniconda3/envs/lerobot/bin"
+if [ -n "${LEROBOT_RECORD_BIN:-}" ]; then
+  LEROBOT="$LEROBOT_RECORD_BIN"
+elif [ -x "$DEFAULT_LEROBOT_ENV/lerobot-record" ]; then
+  LEROBOT="$DEFAULT_LEROBOT_ENV/lerobot-record"
+else
+  LEROBOT="$(command -v lerobot-record)"
+fi
+if [ -n "${LEROBOT_PYTHON_BIN:-}" ]; then
+  PY="$LEROBOT_PYTHON_BIN"
+elif [ -x "$DEFAULT_LEROBOT_ENV/python" ]; then
+  PY="$DEFAULT_LEROBOT_ENV/python"
+else
+  PY="$(command -v python3)"
+fi
 
 DATASET_DIR="$HOME/.cache/huggingface/lerobot/$REPO_ID"
 if [ -d "$DATASET_DIR" ]; then
