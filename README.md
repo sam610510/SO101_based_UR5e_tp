@@ -4,6 +4,10 @@ Teleoperate a UR5e (+ Robotiq 2F-140 gripper) follower arm from an SO101 leader 
 
 This repo does not include any trained models or recorded datasets -- only the code needed to run teleoperation, record data, and drive training/eval through LeRobot.
 
+![Diffusion Policy reach demo, left: third-person view (not seen by the policy), right: the RealSense D435 top camera actually fed to the policy as observation.images.top](media/diffusion_policy_reach_demo.gif)
+
+A Diffusion Policy trained on 24 real-hardware demonstration episodes of a reach task, evaluated live on the real UR5e (checkpoint picked by validation loss on 5 held-out episodes -- see "Training" below). The policy re-plans in chunks, so the arm looks like it is repositioning for the first several seconds before the reach it actually learned becomes visible; let it run to completion rather than judging it from the first few seconds (also discussed under "Evaluating a trained policy").
+
 ## How it works
 
 - `so101_ur5e_teleop_node.py` reads the SO101 leader's joint encoders, computes its end-effector pose via a hand-written forward kinematics chain, linearly maps that pose from the SO101 leader's workspace into the (larger) UR5e workspace, then solves UR5e inverse kinematics (real-time warm-start, falling back to a multi-seed solver when the warm start fails to converge) and streams the result to `scaled_joint_trajectory_controller`.
