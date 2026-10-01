@@ -8,7 +8,7 @@ This repo does not include any trained models or recorded datasets -- only the c
   <img src="media/diffusion_policy_reach_demo.gif" alt="Diffusion Policy reach demo, left: third-person view (not seen by the policy), right: the RealSense D435 top camera actually fed to the policy as observation.images.top">
 </p>
 
-Diffusion Policy for a reach task, trained on 24 real-hardware demonstration episodes (5 more held out for validation), evaluated live on the real UR5e.
+Diffusion Policy for a reach task, trained on a small set of real-hardware demonstration episodes (with a held-out validation split), evaluated live on the real UR5e.
 
 ## How it works
 
