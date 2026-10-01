@@ -80,7 +80,7 @@ source <path-to-your-colcon-ws>/install/setup.bash
 
 Run `lerobot-record` / `lerobot-train` with the `lerobot` env's own interpreter, e.g. `<lerobot-env>/bin/lerobot-record`, or `conda activate`/`source activate` that env first.
 
-## Quick smoke tests
+## Quick mock tests
 
 Before a full recording session, these two scripts independently sanity-check each half of the LeRobot wrapper:
 
